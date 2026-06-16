@@ -364,6 +364,12 @@ footer .disclaimer{margin-top:8px;font-size:11px;color:rgba(255,255,255,.25)}
       <span class="ex-pill" onclick="setQ(this)">员工每年有多少天病假？</span>
       <span class="ex-pill" onclick="setQ(this)">PDPA违规会受到什么处罚？</span>
     </div>
+    <div class="examples-row">
+      <span class="ex-flag">⚖️</span>
+      <span class="ex-pill" onclick="setQ(this)">ฎีกา: เลิกจ้างไม่เป็นธรรม ได้ค่าเสียหายเท่าไหร่?</span>
+      <span class="ex-pill" onclick="setQ(this)">ฎีกา: ครอบครองปรปักษ์ 10 ปีได้กรรมสิทธิ์หรือไม่?</span>
+      <span class="ex-pill" onclick="setQ(this)">Supreme Court: employee embezzlement penalty?</span>
+    </div>
   </div>
 
   <div class="scroll-hint">▼ เลื่อนลงเพื่อดูคำตอบ / Scroll for answers</div>
@@ -414,16 +420,17 @@ footer .disclaimer{margin-top:8px;font-size:11px;color:rgba(255,255,255,.25)}
         <div class="upload-title">📤 อัปโหลดกฎหมายเพิ่มเติม / Upload Law Document</div>
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
              ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
-          <input type="file" id="fileInput" accept=".md" onchange="handleFileSelect(event)"/>
+          <input type="file" id="fileInput" accept=".md,.pdf" onchange="handleFileSelect(event)"/>
           <div class="upload-zone-icon">📄</div>
           <div class="upload-zone-text">
             <strong>คลิกเพื่อเลือกไฟล์</strong> หรือลากไฟล์มาวางที่นี่<br/>
-            Click to browse or drag &amp; drop a file here
+            Click to browse or drag &amp; drop — <strong>PDF</strong> or <strong>Markdown (.md)</strong>
           </div>
         </div>
         <div class="upload-hint">
-          รองรับไฟล์ <strong>.md (Markdown)</strong> เท่านั้น · ขนาดสูงสุด 1 MB<br/>
-          ไฟล์จะถูกเพิ่มเข้าคลังและค้นหาได้ทันที · Uploads persist until server restart
+          📄 <strong>PDF</strong> — แปลงเป็น Markdown อัตโนมัติ รองรับคำพิพากษาฎีกา / Auto-converted, supports Thai Supreme Court judgments<br/>
+          📝 <strong>.md</strong> — อัปโหลดตรง พร้อม YAML frontmatter / Direct upload with YAML frontmatter<br/>
+          ขนาดสูงสุด 10 MB · ค้นหาได้ทันที · Uploads persist until server restart
         </div>
         <div class="upload-progress" id="uploadProgress">⏳ กำลังอัปโหลด... / Uploading...</div>
         <div class="upload-status" id="uploadStatus"></div>
@@ -440,7 +447,8 @@ footer .disclaimer{margin-top:8px;font-size:11px;color:rgba(255,255,255,.25)}
 // ── Library modal ───────────────────────────────────────────────────────
 const LAW_ICONS = {
   'labour': '👷', 'factory': '🏭', 'land': '🏞️', 'pdpa': '🔐',
-  'cybersecurity': '🛡️', 'civil': '📋', 'foreign-business': '🌏', 'default': '📜'
+  'cybersecurity': '🛡️', 'civil': '📋', 'foreign-business': '🌏',
+  'supreme-court': '⚖️', 'uploads': '📤', 'default': '📜'
 };
 
 function openLibrary() {
@@ -636,7 +644,9 @@ async function uploadFile(file) {
       status.textContent = '❌ ' + (data.detail || 'Upload failed');
       status.className = 'upload-status error';
     } else {
-      status.textContent = `✅ "${data.filename}" อัปโหลดสำเร็จ · คลังมี ${data.doc_count} เอกสาร / Uploaded successfully — library now has ${data.doc_count} documents`;
+      const isPdf = file.name.toLowerCase().endsWith('.pdf');
+      const note = isPdf ? ' (แปลงจาก PDF แล้ว / converted from PDF)' : '';
+      status.textContent = `✅ "${data.filename}"${note} — คลังมี ${data.doc_count} เอกสาร / library now has ${data.doc_count} documents`;
       status.className = 'upload-status success';
       loadDocs(); // refresh the list
     }
