@@ -49,8 +49,9 @@ CRITICAL: Always quote the exact text of relevant provisions OR judgment holding
 
 **Plain meaning:** [Explanation in simple language]
 
-When citing Supreme Court judgments (คำพิพากษาฎีกา), state the case number, year, parties, and the legal principle established.
-Detect the question language and respond in that language. End with brief summaries in the other two languages."""
+When citing Supreme Court judgments (คำพิพากษาฎีกา), you MUST state the exact case number in the format "ฎีกาที่ XXXX/YYYY" so it can be linked to deka.supremecourt.or.th. Include the parties and the legal principle established.
+Detect the question language and respond in that language. End with brief summaries in the other two languages.
+IMPORTANT: Never truncate your answer. Always write a complete response covering all relevant provisions and judgments found in the source material."""
 
 class QuestionRequest(BaseModel):
     question: str
@@ -99,7 +100,7 @@ def ask(req: QuestionRequest):
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"--- ข้อมูลกฎหมาย / Law Excerpts ---\n{context}\n\n--- คำถาม ---\n{req.question}\n\n--- คำตอบ ---"},
             ],
-            max_tokens=2000,
+            max_tokens=3000,
             temperature=0.3,
         )
         answer = response.choices[0].message.content

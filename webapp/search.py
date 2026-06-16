@@ -87,11 +87,22 @@ def extract_excerpt(content: str, tokens: list[str], max_len: int = 800) -> str:
         hits = sum(1 for t in tokens if t in line_tokens)
         scored.append((hits, i))
     scored.sort(reverse=True)
-    best_lines = sorted(set(idx for _, idx in scored[:8]))
+    best_indices = set(idx for _, idx in scored[:8])
+
+    # Always pull in the nearest section heading above each matched line
+    # so case numbers (## คำพิพากษาฎีกาที่ XXXX/YYYY) are never dropped
+    heading_indices = set()
+    for idx in best_indices:
+        for j in range(idx, -1, -1):
+            if lines[j].startswith('#'):
+                heading_indices.add(j)
+                break
+
+    all_indices = sorted(best_indices | heading_indices)
     excerpt_lines = []
-    for i in best_lines:
-        start = max(0, i-1)
-        end = min(len(lines), i+3)
+    for i in all_indices:
+        start = max(0, i - 1)
+        end = min(len(lines), i + 4)
         excerpt_lines.extend(lines[start:end])
     excerpt = '\n'.join(dict.fromkeys(excerpt_lines))
     return excerpt[:max_len] if len(excerpt) > max_len else excerpt
