@@ -32,8 +32,19 @@ def load_documents():
 
 def tokenize(text: str) -> list[str]:
     text = text.lower()
-    # Thai words, English words, and individual Chinese characters
-    tokens = re.findall(r'[฀-๿]+|[a-z0-9]+|[一-鿿]', text)
+    tokens = []
+    # Split into runs: Thai, English/digits, Chinese
+    for chunk in re.finditer(r'[฀-๿]+|[a-z0-9]+|[一-鿿]+', text):
+        s = chunk.group()
+        if re.match(r'[฀-๿]', s):
+            # Thai: use overlapping bigrams so partial words still match
+            tokens.extend(s[i:i+2] for i in range(len(s) - 1))
+            tokens.extend(s[i:i+3] for i in range(len(s) - 2))
+        elif re.match(r'[一-鿿]', s):
+            # Chinese: individual characters
+            tokens.extend(s)
+        else:
+            tokens.append(s)
     return tokens
 
 class LawSearch:
@@ -47,18 +58,18 @@ class LawSearch:
         scores = self.bm25.get_scores(tokens)
         ranked = sorted(enumerate(scores), key=lambda x: x[1], reverse=True)
         results = []
-        for idx, score in ranked[:top_k]:
+        for rank, (idx, score) in enumerate(ranked[:top_k]):
             if score > 0:
                 d = self.docs[idx]
-                # Extract most relevant excerpt (~600 chars around query terms)
-                excerpt = extract_excerpt(d["content"], tokens)
+                # Top result gets larger excerpt so model can quote provisions verbatim
+                max_len = 2000 if rank == 0 else 1000
+                excerpt = extract_excerpt(d["content"], tokens, max_len=max_len)
                 results.append({
                     "title": d["title"],
                     "title_en": d["title_en"],
                     "path": d["path"],
                     "score": round(score, 3),
                     "excerpt": excerpt,
-                    "full_content": d["content"],
                 })
         return results
 
@@ -76,7 +87,7 @@ def extract_excerpt(content: str, tokens: list[str], max_len: int = 800) -> str:
         hits = sum(1 for t in tokens if t in line_tokens)
         scored.append((hits, i))
     scored.sort(reverse=True)
-    best_lines = sorted(set(idx for _, idx in scored[:5]))
+    best_lines = sorted(set(idx for _, idx in scored[:8]))
     excerpt_lines = []
     for i in best_lines:
         start = max(0, i-1)
