@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>📚 Law Library Q&A</title>
+<style>
+:root{
+  --green:#1b5e20;--green2:#2e7d32;--green3:#e8f5e9;--green4:#c8e6c9;
+  --blue:#1565c0;--blue2:#e3f2fd;
+  --gold:#f9a825;--gold2:#fff8e1;
+  --text:#1a1a1a;--muted:#666;--border:#dee2e6;--bg:#f8f9fa;--white:#fff;
+  --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Header */
+.header{background:linear-gradient(135deg,var(--green) 0%,var(--green2) 100%);color:#fff;padding:20px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.header-icon{font-size:36px}
+.header-text h1{font-size:22px;font-weight:700;margin-bottom:2px}
+.header-text p{font-size:13px;opacity:.85}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:280px 1fr;gap:0;min-height:calc(100vh - 82px)}
+
+/* Sidebar */
+.sidebar{background:var(--white);border-right:1px solid var(--border);padding:20px 16px;overflow-y:auto}
+.sidebar h3{font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.doc-list{display:flex;flex-direction:column;gap:6px}
+.doc-item{padding:10px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .15s}
+.doc-item:hover{background:var(--green3);border-color:var(--green4)}
+.doc-item .doc-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
+.doc-item .doc-title-en{font-size:11px;color:var(--blue);margin-top:2px;font-style:italic}
+.doc-item .doc-tags{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px}
+.tag{font-size:10px;background:var(--green3);color:var(--green);padding:1px 6px;border-radius:10px;font-weight:600}
+.sidebar-actions{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.btn-reload{width:100%;padding:8px;background:var(--green3);color:var(--green);border:1px solid var(--green4);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-reload:hover{background:var(--green4)}
+
+/* API Key setup */
+.api-setup{background:var(--gold2);border:1px solid var(--gold);border-radius:10px;padding:14px;margin-bottom:16px}
+.api-setup h4{font-size:13px;font-weight:700;color:#5d4037;margin-bottom:8px}
+.api-setup input{width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;font-family:monospace;margin-bottom:6px}
+.api-setup .btn-save{width:100%;padding:6px;background:#f9a825;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.api-setup .btn-save:hover{background:#f57f17}
+.api-ok{background:#e8f5e9;border-color:#a5d6a7;color:#2e7d32;font-size:12px;padding:8px 10px;border-radius:8px;border:1px solid;margin-bottom:10px;text-align:center}
+
+/* Main */
+.main{padding:24px;display:flex;flex-direction:column;gap:20px;max-width:900px}
+
+/* Ask box */
+.ask-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px}
+.ask-card h2{font-size:16px;font-weight:700;color:var(--green);margin-bottom:14px}
+.ask-row{display:flex;gap:10px}
+.ask-input{flex:1;padding:12px 16px;border:2px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;transition:border .15s;resize:none}
+.ask-input:focus{outline:none;border-color:var(--green2)}
+.btn-ask{padding:12px 24px;background:var(--green2);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-ask:hover{background:var(--green)}
+.btn-ask:disabled{background:#aaa;cursor:not-allowed}
+.example-questions{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.example-q{font-size:12px;padding:4px 10px;background:var(--green3);color:var(--green);border:1px solid var(--green4);border-radius:20px;cursor:pointer;transition:all .15s}
+.example-q:hover{background:var(--green4)}
+
+/* Answer */
+.answer-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;display:none}
+.answer-card.visible{display:block}
+.answer-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.answer-header h3{font-size:15px;font-weight:700;color:var(--text)}
+.answer-body{font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap;background:var(--bg);padding:16px;border-radius:8px;border:1px solid var(--border)}
+.sources{margin-top:16px}
+.sources h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.source-item{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:var(--blue2);border-radius:8px;margin-bottom:6px}
+.source-icon{font-size:16px;flex-shrink:0}
+.source-text .st{font-size:13px;font-weight:600;color:var(--blue)}
+.source-text .se{font-size:11px;color:var(--muted);font-style:italic}
+.source-path{font-size:10px;color:#999;margin-top:2px;font-family:monospace}
+
+/* Loading */
+.loading{display:none;text-align:center;padding:30px;color:var(--muted)}
+.loading.visible{display:block}
+.spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--green4);border-top-color:var(--green2);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Gemini badge */
+.powered-by{font-size:11px;color:var(--muted);text-align:center;margin-top:auto;padding-top:10px}
+
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{border-right:none;border-bottom:1px solid var(--border)}
+  .ask-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">📚</div>
+  <div class="header-text">
+    <h1>Law Library Q&A</h1>
+    <p>ระบบค้นหากฎหมายและตอบคำถามทางกฎหมาย / Thai Law Knowledge Base / 泰国法律知识库</p>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar: document list -->
+  <div class="sidebar">
+    <!-- API Key -->
+    <div id="apiSetup" class="api-setup">
+      <h4>🔑 Gemini API Key (Free)</h4>
+      <p style="font-size:11px;color:#795548;margin-bottom:8px">
+        รับฟรีที่ <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue)">aistudio.google.com</a><br/>
+        Get free key at Google AI Studio
+      </p>
+      <input type="password" id="apiKeyInput" placeholder="AIza..."/>
+      <button class="btn-save" onclick="saveApiKey()">💾 บันทึก / Save</button>
+    </div>
+    <div id="apiOk" class="api-ok" style="display:none">✅ ตั้งค่า API Key แล้ว / API Key saved</div>
+
+    <h3>📖 กฎหมายในคลัง / Law Library</h3>
+    <div class="doc-list" id="docList">
+      <div style="color:var(--muted);font-size:13px;padding:10px">กำลังโหลด... / Loading...</div>
+    </div>
+    <div class="sidebar-actions">
+      <button class="btn-reload" onclick="reloadDocs()">🔄 โหลดใหม่ / Reload Library</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+    <div class="ask-card">
+      <h2>🔍 ถามคำถามทางกฎหมาย / Ask a Legal Question / 提问法律问题</h2>
+      <div class="ask-row">
+        <textarea class="ask-input" id="questionInput" rows="3"
+          placeholder="พิมพ์คำถามกฎหมายของคุณที่นี่... / Type your legal question here... / 在此输入您的法律问题..."></textarea>
+        <button class="btn-ask" id="askBtn" onclick="askQuestion()">ถาม<br/>Ask</button>
+      </div>
+      <div class="example-questions">
+        <span style="font-size:12px;color:var(--muted);align-self:center;font-weight:600">🇹🇭 TH:</span>
+        <span class="example-q" onclick="setQ(this)">ลูกจ้างลาป่วยได้กี่วันต่อปี?</span>
+        <span class="example-q" onclick="setQ(this)">ถูกเลิกจ้างไม่เป็นธรรม ได้รับค่าชดเชยเท่าไหร่?</span>
+        <span class="example-q" onclick="setQ(this)">PDPA กำหนดบทลงโทษอย่างไร?</span>
+        <span class="example-q" onclick="setQ(this)">ต่างชาติซื้อที่ดินในไทยได้ไหม?</span>
+      </div>
+      <div class="example-questions" style="margin-top:6px">
+        <span style="font-size:12px;color:var(--muted);align-self:center;font-weight:600">🇬🇧 EN:</span>
+        <span class="example-q" onclick="setQ(this)">How many sick leave days per year?</span>
+        <span class="example-q" onclick="setQ(this)">What permits does a Type 3 factory need?</span>
+        <span class="example-q" onclick="setQ(this)">Can foreigners own land in Thailand?</span>
+        <span class="example-q" onclick="setQ(this)">What are PDPA penalties?</span>
+      </div>
+      <div class="example-questions" style="margin-top:6px">
+        <span style="font-size:12px;color:var(--muted);align-self:center;font-weight:600">🇨🇳 中文:</span>
+        <span class="example-q" onclick="setQ(this)">员工每年可以请多少天病假？</span>
+        <span class="example-q" onclick="setQ(this)">外国人可以在泰国购买土地吗？</span>
+        <span class="example-q" onclick="setQ(this)">PDPA对违规行为有哪些处罚？</span>
+        <span class="example-q" onclick="setQ(this)">被不当解雇可以获得多少赔偿？</span>
+      </div>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>กำลังค้นหาและวิเคราะห์กฎหมาย...<br/>Searching and analyzing law...</p>
+    </div>
+
+    <div class="answer-card" id="answerCard">
+      <div class="answer-header">
+        <span style="font-size:20px">⚖️</span>
+        <h3 id="answerQuestion"></h3>
+      </div>
+      <div class="answer-body" id="answerBody"></div>
+      <div class="sources" id="sourcesDiv"></div>
+    </div>
+
+    <div class="powered-by">Powered by Google Gemini Free Tier + BM25 Search · Law Library Q&A</div>
+  </div>
+</div>
+
+<script>
+// Check saved API key
+const savedKey = localStorage.getItem('gemini_api_key');
+if (savedKey) {
+  document.getElementById('apiSetup').style.display = 'none';
+  document.getElementById('apiOk').style.display = 'block';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) return;
+  localStorage.setItem('gemini_api_key', key);
+  document.getElementById('apiSetup').style.display = 'none';
+  document.getElementById('apiOk').style.display = 'block';
+  // Send key to server for this session
+  fetch('/api/set-key', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({key}) });
+}
+
+function setQ(el) {
+  document.getElementById('questionInput').value = el.textContent;
+  document.getElementById('questionInput').focus();
+}
+
+async function loadDocs() {
+  const res = await fetch('/api/docs');
+  const data = await res.json();
+  const list = document.getElementById('docList');
+  if (!data.documents.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px">ไม่พบเอกสาร</div>';
+    return;
+  }
+  list.innerHTML = data.documents.map(d => `
+    <div class="doc-item">
+      <div class="doc-title">${d.title}</div>
+      ${d.title_en ? `<div class="doc-title-en">${d.title_en}</div>` : ''}
+      <div class="doc-tags">${(d.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+async function reloadDocs() {
+  await fetch('/api/reload', {method:'POST'});
+  loadDocs();
+}
+
+async function askQuestion() {
+  const question = document.getElementById('questionInput').value.trim();
+  if (!question) return;
+
+  // Show loading
+  document.getElementById('loading').classList.add('visible');
+  document.getElementById('answerCard').classList.remove('visible');
+  document.getElementById('askBtn').disabled = true;
+
+  // Pass API key if available
+  const key = localStorage.getItem('gemini_api_key') || '';
+  if (key) {
+    await fetch('/api/set-key', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({key}) });
+  }
+
+  try {
+    const res = await fetch('/api/ask', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({question})
+    });
+    const data = await res.json();
+
+    document.getElementById('answerQuestion').textContent = question;
+    document.getElementById('answerBody').textContent = data.answer;
+
+    const sourcesDiv = document.getElementById('sourcesDiv');
+    if (data.sources && data.sources.length) {
+      sourcesDiv.innerHTML = `<h4>📄 แหล่งอ้างอิง / Sources</h4>` +
+        data.sources.map(s => `
+          <div class="source-item">
+            <span class="source-icon">📜</span>
+            <div class="source-text">
+              <div class="st">${s.title}</div>
+              ${s.title_en ? `<div class="se">${s.title_en}</div>` : ''}
+              <div class="source-path">vault/${s.path}</div>
+            </div>
+          </div>
+        `).join('');
+    } else {
+      sourcesDiv.innerHTML = '';
+    }
+
+    document.getElementById('answerCard').classList.add('visible');
+  } catch(e) {
+    document.getElementById('answerBody').textContent = 'เกิดข้อผิดพลาด: ' + e.message;
+    document.getElementById('answerCard').classList.add('visible');
+  } finally {
+    document.getElementById('loading').classList.remove('visible');
+    document.getElementById('askBtn').disabled = false;
+  }
+}
+
+// Enter key to submit
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('questionInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); askQuestion(); }
+  });
+  loadDocs();
+});
+</script>
+</body>
+</html>
