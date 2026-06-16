@@ -1,10 +1,14 @@
 import os
+from pathlib import Path
 from openai import OpenAI
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from search import LawSearch
+
+VAULT_PATH = Path(__file__).parent.parent / "vault"
+UPLOADS_PATH = VAULT_PATH / "uploads"
 
 app = FastAPI(title="Law Library Q&A")
 searcher = LawSearch()
@@ -102,6 +106,22 @@ def ask(req: QuestionRequest):
         answer = f"❌ เกิดข้อผิดพลาด: {str(e)}\n\nข้อมูลจากกฎหมายที่เกี่ยวข้อง:\n\n{context}"
 
     return {"answer": answer, "sources": sources}
+
+@app.post("/api/upload")
+async def upload_law(file: UploadFile = File(...)):
+    if not file.filename.endswith(".md"):
+        raise HTTPException(400, "Only .md (Markdown) files are accepted")
+    content = await file.read()
+    if len(content) > 1_000_000:  # 1 MB limit
+        raise HTTPException(400, "File too large (max 1 MB)")
+    UPLOADS_PATH.mkdir(parents=True, exist_ok=True)
+    safe_name = "".join(c for c in file.filename if c.isalnum() or c in "._- ").strip()
+    if not safe_name:
+        safe_name = "upload.md"
+    dest = UPLOADS_PATH / safe_name
+    dest.write_bytes(content)
+    searcher.reload()
+    return {"status": "ok", "filename": safe_name, "doc_count": len(searcher.docs)}
 
 @app.post("/api/reload")
 def reload_docs():
