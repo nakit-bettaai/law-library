@@ -82,7 +82,7 @@ nav{
   background: linear-gradient(to bottom, rgba(0,0,0,.45) 0%, rgba(0,0,0,.20) 40%, rgba(0,0,0,.70) 100%);
   z-index:1;
 }
-.hero > *{position:relative;z-index:1}
+.hero > *{position:relative;z-index:2}
 
 /* Decorative divider line */
 .hero-divider{
@@ -93,8 +93,8 @@ nav{
 .hero-divider-line.right{background:linear-gradient(to left,transparent,var(--gold))}
 .hero-divider-badge{
   font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--gold);padding:4px 16px;border:1px solid rgba(201,168,76,.4);border-radius:20px;
-  background:rgba(201,168,76,.08);white-space:nowrap;
+  color:var(--gold2);padding:4px 16px;border:1px solid rgba(201,168,76,.6);border-radius:20px;
+  background:rgba(0,0,0,.5);white-space:nowrap;
 }
 
 .hero h1{
@@ -102,22 +102,23 @@ nav{
   font-size:clamp(32px,5.5vw,64px);
   font-weight:900;color:#fff;
   line-height:1.1;margin-bottom:6px;
-  text-shadow:0 2px 20px rgba(0,0,0,.5);
+  text-shadow:0 2px 8px rgba(0,0,0,.9),0 4px 32px rgba(0,0,0,.7);
   letter-spacing:-.5px;
 }
 .hero h1 em{font-style:normal;color:var(--gold2)}
 .hero-sub{
-  font-size:clamp(14px,1.8vw,17px);color:rgba(255,255,255,.7);
+  font-size:clamp(14px,1.8vw,17px);color:#fff;
   margin-bottom:48px;line-height:1.7;max-width:580px;
-  font-weight:400;letter-spacing:.2px;
+  font-weight:500;letter-spacing:.2px;
+  text-shadow:0 1px 6px rgba(0,0,0,.85),0 2px 16px rgba(0,0,0,.6);
 }
 .hero-lang-row{
   display:flex;gap:10px;justify-content:center;margin-bottom:40px;flex-wrap:wrap;
 }
 .lang-chip{
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
-  color:rgba(255,255,255,.75);padding:5px 14px;border-radius:20px;font-size:12px;
-  font-weight:500;letter-spacing:.3px;
+  background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.35);
+  color:#fff;padding:5px 14px;border-radius:20px;font-size:12px;
+  font-weight:600;letter-spacing:.3px;
 }
 
 /* ── QUESTION BOX ── */
@@ -163,17 +164,18 @@ nav{
 /* ── EXAMPLE PILLS ── */
 .examples-wrap{max-width:780px;width:100%;margin:24px auto 0;padding:0 4px}
 .examples-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
-.ex-flag{font-size:12px;font-weight:700;color:rgba(255,255,255,.6);min-width:32px}
+.ex-flag{font-size:12px;font-weight:700;color:#fff;min-width:32px;text-shadow:0 1px 4px rgba(0,0,0,.7)}
 .ex-pill{
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
-  color:rgba(255,255,255,.85);padding:5px 14px;border-radius:20px;font-size:12px;
+  background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);
+  color:#fff;padding:5px 14px;border-radius:20px;font-size:12px;
   cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Inter',sans-serif;
+  text-shadow:0 1px 4px rgba(0,0,0,.6);
 }
-.ex-pill:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4);color:#fff}
+.ex-pill:hover{background:rgba(0,0,0,.7);border-color:rgba(255,255,255,.6);color:#fff}
 
 /* ── SCROLL INDICATOR ── */
 .scroll-hint{
-  margin-top:40px;color:rgba(255,255,255,.4);font-size:12px;
+  margin-top:40px;color:rgba(255,255,255,.85);font-size:12px;text-shadow:0 1px 4px rgba(0,0,0,.7);
   display:flex;flex-direction:column;align-items:center;gap:6px;
   animation:fadeup 2s ease infinite;
 }
