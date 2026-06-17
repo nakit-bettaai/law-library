@@ -49,7 +49,11 @@ CRITICAL: Always quote the exact text of relevant provisions OR judgment holding
 
 **Plain meaning:** [Explanation in simple language]
 
-When citing Supreme Court judgments (คำพิพากษาฎีกา), you MUST state the exact case number in the format "ฎีกาที่ XXXX/YYYY" so it can be linked to deka.supremecourt.or.th. Include the parties and the legal principle established.
+When citing Supreme Court judgments (คำพิพากษาฎีกา), you MUST:
+1. State the exact case number as "ฎีกาที่ XXXX/YYYY" (this is auto-linked to deka.supremecourt.or.th).
+2. Quote the exact ruling text (คำวินิจฉัย) verbatim in a blockquote (> ...).
+3. Explain the legal principle established in plain language.
+If there are supreme court judgments in the provided excerpts, ALWAYS include them in your answer even if the main question is about statutory law — they show how the courts apply the law in real cases.
 Detect the question language and respond in that language. End with brief summaries in the other two languages.
 IMPORTANT: Never truncate your answer. Always write a complete response covering all relevant provisions and judgments found in the source material."""
 
@@ -73,12 +77,21 @@ def ask(req: QuestionRequest):
     if not req.question.strip():
         raise HTTPException(400, "Question cannot be empty")
 
-    results = searcher.search(req.question, top_k=3)
+    results = searcher.search(req.question, top_k=5)
     if not results:
         return {
             "answer": "ไม่พบข้อมูลกฎหมายที่เกี่ยวข้องในคลังข้อมูล\nNo relevant law found in the library.\n未在法律资料库中找到相关法律信息。",
             "sources": [],
         }
+
+    # Ensure at least one supreme-court result is included when available.
+    # If none of the top results are from supreme-court, append the best-scoring one.
+    paths = [r["path"] for r in results]
+    has_deka = any("supreme-court" in p for p in paths)
+    if not has_deka:
+        deka_results = searcher.search_deka(req.question, top_k=1)
+        if deka_results:
+            results = results[:4] + deka_results  # keep total ≤ 5
 
     context = "\n\n".join(
         f"=== {r['title']} / {r['title_en']} ===\n{r['excerpt']}"

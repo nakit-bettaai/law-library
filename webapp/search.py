@@ -73,6 +73,24 @@ class LawSearch:
                 })
         return results
 
+    def search_deka(self, query: str, top_k: int = 2) -> list[dict]:
+        """Search only within supreme-court documents and return top matches."""
+        tokens = tokenize(query)
+        scores = self.bm25.get_scores(tokens)
+        results = []
+        for idx, d in enumerate(self.docs):
+            if "supreme-court" not in d["path"]:
+                continue
+            s = scores[idx]
+            if s > 0:
+                excerpt = extract_excerpt(d["content"], tokens, max_len=1500)
+                results.append({
+                    "title": d["title"], "title_en": d["title_en"],
+                    "path": d["path"], "score": round(s, 3), "excerpt": excerpt,
+                })
+        results.sort(key=lambda x: x["score"], reverse=True)
+        return results[:top_k]
+
     def reload(self):
         self.__init__()
 
